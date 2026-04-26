@@ -72,7 +72,6 @@ const DEFAULT_STATE = {
     heroPrimaryUrl: "#projects",
     heroOutlineText: "Contact Me",
     heroOutlineUrl: "#contact",
-    ghToken: "",
     ghRepo: "Oussama12520/Osama.dev.portfolio",
     ghBranch: "main",
     adminHotkey: "L",
@@ -654,8 +653,10 @@ function deleteCert(id) {
 
 async function syncToGitHub() {
   const s = state.settings;
-  if (!s.ghToken || !s.ghRepo) {
-    toast('GitHub Config missing in Settings!', 'error');
+  const ghToken = localStorage.getItem('osama_portfolio_token');
+  
+  if (!ghToken || !s.ghRepo) {
+    toast('GitHub Token or Repo missing in Settings!', 'error');
     showPanel('settings');
     return;
   }
@@ -676,7 +677,7 @@ async function syncToGitHub() {
     
     // 1. Get current file SHA (with cache buster to avoid 409)
     const getRes = await fetch(`${baseUrl}?ref=${branch}&t=${Date.now()}`, {
-      headers: { 'Authorization': `token ${s.ghToken}` }
+      headers: { 'Authorization': `token ${ghToken}` }
     });
 
     let sha = '';
@@ -698,7 +699,7 @@ async function syncToGitHub() {
     const putRes = await fetch(baseUrl, {
       method: 'PUT',
       headers: {
-        'Authorization': `token ${s.ghToken}`,
+        'Authorization': `token ${ghToken}`,
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({
@@ -792,6 +793,13 @@ function deleteMsg(id) {
 // ── SETTINGS ──
 function loadAdminSettings() {
   const s = state.settings;
+  const token = localStorage.getItem('osama_portfolio_token') || '';
+  const setToken = document.getElementById('set-gh-token');
+  if (setToken) setToken.value = token;
+  
+  const setRepo = document.getElementById('set-gh-repo');
+  if (setRepo) setRepo.value = s.ghRepo || '';
+
   const github = document.getElementById('set-github');
   const linkedin = document.getElementById('set-linkedin');
   const email = document.getElementById('set-email');
@@ -874,7 +882,7 @@ function saveSettings() {
   const ghRepoInput = document.getElementById('set-gh-repo');
   const ghBranch = document.getElementById('set-gh-branch');
   
-  if (ghToken) s.ghToken = ghToken.value;
+  if (ghToken) localStorage.setItem('osama_portfolio_token', ghToken.value);
   if (ghBranch) s.ghBranch = ghBranch.value;
 
   if (ghRepoInput) {
