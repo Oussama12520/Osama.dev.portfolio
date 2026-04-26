@@ -1,4 +1,7 @@
-const DEFAULT_STATE = {
+(function() {
+"use strict";
+
+var DEFAULT_STATE = {
   projects: [
     { id: 1, title: "Microservices Auth Platform", desc: "Distributed authentication system with JWT, OAuth2, and role-based access control serving 500k+ daily requests. Built with async Python and Redis caching.", techs: ["Python", "FastAPI", "Redis", "PostgreSQL", "Docker"], demo: "", github: "", images: [], cat: "API" },
     { id: 2, title: "Real-time Analytics Pipeline", desc: "Event-driven data pipeline processing 10M+ events/day using Kafka streams, with a GraphQL API layer and automated alerting system.", techs: ["Node.js", "Kafka", "GraphQL", "ClickHouse", "K8s"], demo: "", github: "", images: [], cat: "Microservice" },
@@ -11,13 +14,11 @@ const DEFAULT_STATE = {
   messages: [],
   settings: {
     github: "https://github.com/Oussama12520",
-    linkedin: "https://www.linkedin.com/in/oussemamasmoudi-a18151362/",
-    email: "oussemamasmoudi7@gmail.com",
-    discord: "https://discord.gg/RhpHd3Uyge",
-    telegram: "t.me/iOsama_0x1",
-    instagram: "https://www.instagram.com/ous7x_/",
-    skills: "Python,FastAPI,C#,.NET,Node.js,Express,PostgreSQL,MongoDB,Redis,Docker,Kubernetes,REST APIs,GraphQL,gRPC,JWT,OAuth2,System Design,Microservices,CI/CD,AWS,Linux",
-    bio: "I architect scalable backend systems and build APIs that power modern applications.",
+    linkedin: "https://www.linkedin.com/in/oussama-mansouri-019623291/",
+    email: "oussamajon24@gmail.com",
+    discord: "", telegram: "", instagram: "",
+    skills: "React, Node.js, JavaScript, HTML, CSS",
+    bio: "Full Stack Developer passionate about building modern web applications.",
     photoAnimation: true,
     statusWidget: true,
     heroPrimaryText: "View Projects →",
@@ -32,7 +33,7 @@ const DEFAULT_STATE = {
   nextId: 10
 };
 
-let state = DEFAULT_STATE;
+var state = DEFAULT_STATE;
 
 // ── GLOBAL ERROR HANDLING ──
 window.onerror = function(msg, url, line) {
@@ -1216,9 +1217,45 @@ function generateCaptcha() {
   if (aEl) aEl.value = '';
 }
 
-setTimeout(() => {
-  if (typeof state !== 'undefined' && state.projects) {
-    animateNum(document.getElementById('stat-projects'), state.projects.length);
-    animateNum(document.getElementById('stat-certs'), state.certs.length);
-  }
-}, 600);
+  setTimeout(() => {
+    if (typeof state !== 'undefined' && state.projects) {
+      animateNum(document.getElementById('stat-projects'), state.projects.length);
+      animateNum(document.getElementById('stat-certs'), state.certs.length);
+    }
+  }, 600);
+
+  // Expose necessary functions to window
+  window.openLogin = openLogin;
+  window.closeLogin = closeLogin;
+  window.doLogin = doLogin;
+  window.logout = logout;
+  window.exitAdmin = exitAdmin;
+  window.showPanel = showPanel;
+  window.openProjectForm = openProjectForm;
+  window.saveProject = saveProject;
+  window.editProject = editProject;
+  window.closeProjectForm = closeProjectForm;
+  window.deleteProject = deleteProject;
+  window.openCertForm = openCertForm;
+  window.saveCert = saveCert;
+  window.editCert = editCert;
+  window.closeCertForm = closeCertForm;
+  window.deleteCert = deleteCert;
+  window.syncToGitHub = syncToGitHub;
+  window.markRead = markRead;
+  window.deleteMsg = deleteMsg;
+  window.saveSettings = saveSettings;
+  window.wipeLocalData = wipeLocalData;
+  window.captureHotkey = captureHotkey;
+  window.openProjectDetail = openProjectDetail;
+  window.closeProjectDetail = closeProjectDetail;
+  window.toggleTerminal = toggleTerminal;
+  window.setFilter = setFilter;
+  window.sendMessage = sendMessage;
+  window.closeCertModal = closeCertModal;
+  window.openCertModal = openCertModal;
+  window.handleImageUpload = handleImageUpload;
+  window.handleMultipleUpload = handleMultipleUpload;
+  window.setProjectCover = setProjectCover;
+
+})();
