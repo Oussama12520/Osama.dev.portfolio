@@ -707,7 +707,10 @@ async function syncToGitHub() {
       })
     });
 
-    if (!putRes.ok) throw new Error(`Push failed: ${putRes.statusText}`);
+    if (!putRes.ok) {
+      const errData = await putRes.json().catch(() => ({}));
+      throw new Error(`Push failed: ${putRes.status} ${errData.message || putRes.statusText}`);
+    }
 
     status.style.color = 'var(--green)';
     status.textContent = '> ✅ SUCCESS: Deploying to production...';
@@ -725,7 +728,10 @@ async function syncToGitHub() {
     status.textContent = `> ❌ ERROR: ${err.message}`;
     btn.disabled = false;
     btn.textContent = 'Retry Sync';
-    toast('Sync failed. Check console or settings.', 'error');
+    
+    if (err.message.includes('401')) toast('Invalid GitHub Token! Check Settings.', 'error');
+    else if (err.message.includes('404')) toast('Repository not found! Check Settings.', 'error');
+    else toast('Sync failed: ' + err.message, 'error');
   }
 }
 
