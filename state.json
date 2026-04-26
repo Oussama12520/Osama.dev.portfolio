@@ -27,8 +27,8 @@
     "instagram": "",
     "skills": "undefined",
     "bio": "undefined",
-    "photoAnimation": true,
-    "statusWidget": true,
+    "photoAnimation": false,
+    "statusWidget": false,
     "heroPrimaryText": "",
     "heroPrimaryUrl": "",
     "heroOutlineText": "",
@@ -36,7 +36,7 @@
     "ghRepo": "Oussama12520/Osama.dev.portfolio",
     "ghBranch": "main",
     "adminHotkey": "V",
-    "showAdminLink": true
+    "showAdminLink": false
   },
   "nextId": 18
 }
