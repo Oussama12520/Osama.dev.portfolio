@@ -80,77 +80,93 @@ const DEFAULT_STATE = {
   nextId: 10
 };
 
-let state = DEFAULT_STATE;
-
-// ── DATABASE (IndexedDB Upgrade) ──
-const DB_NAME = 'OsamaPortfolioDB';
+// ── DATABASE (Unique v4 Upgrade) ──
+const DB_NAME = 'Osama_Portfolio_v4';
 const STORE_NAME = 'state';
 
 function openDB() {
   return new Promise((resolve, reject) => {
-    const request = indexedDB.open(DB_NAME, 1);
-    request.onupgradeneeded = () => request.result.createObjectStore(STORE_NAME);
-    request.onsuccess = () => resolve(request.result);
-    request.onerror = () => reject(request.error);
+    try {
+      const request = indexedDB.open(DB_NAME, 1);
+      request.onupgradeneeded = () => {
+        const db = request.result;
+        if (!db.objectStoreNames.contains(STORE_NAME)) {
+          db.createObjectStore(STORE_NAME);
+        }
+      };
+      request.onsuccess = () => resolve(request.result);
+      request.onerror = () => reject(request.error);
+    } catch (e) {
+      reject(e);
+    }
   });
 }
 
 async function setLocal(key, value) {
-  const db = await openDB();
-  return new Promise((resolve, reject) => {
-    const tx = db.transaction(STORE_NAME, 'readwrite');
-    tx.objectStore(STORE_NAME).put(value, key);
-    tx.oncomplete = () => resolve();
-    tx.onerror = () => reject(tx.error);
-  });
+  try {
+    const db = await openDB();
+    return new Promise((resolve, reject) => {
+      const tx = db.transaction(STORE_NAME, 'readwrite');
+      tx.objectStore(STORE_NAME).put(value, key);
+      tx.oncomplete = () => resolve();
+      tx.onerror = () => reject(tx.error);
+    });
+  } catch (e) { console.error("setLocal failed", e); }
 }
 
 async function getLocal(key) {
-  const db = await openDB();
-  return new Promise((resolve, reject) => {
-    const tx = db.transaction(STORE_NAME, 'readonly');
-    const request = tx.objectStore(STORE_NAME).get(key);
-    request.onsuccess = () => resolve(request.result);
-    request.onerror = () => reject(request.error);
-  });
+  try {
+    const db = await openDB();
+    return new Promise((resolve, reject) => {
+      const tx = db.transaction(STORE_NAME, 'readonly');
+      const request = tx.objectStore(STORE_NAME).get(key);
+      request.onsuccess = () => resolve(request.result);
+      request.onerror = () => reject(request.error);
+    });
+  } catch (e) { 
+    console.error("getLocal failed", e); 
+    return null;
+  }
 }
 
 async function clearLocal() {
-  const db = await openDB();
-  return new Promise((resolve, reject) => {
-    const tx = db.transaction(STORE_NAME, 'readwrite');
-    tx.objectStore(STORE_NAME).clear();
-    tx.oncomplete = () => resolve();
-    tx.onerror = () => reject(tx.error);
-  });
+  try {
+    const db = await openDB();
+    return new Promise((resolve, reject) => {
+      const tx = db.transaction(STORE_NAME, 'readwrite');
+      tx.objectStore(STORE_NAME).clear();
+      tx.oncomplete = () => resolve();
+      tx.onerror = () => reject(tx.error);
+    });
+  } catch (e) { console.error("clearLocal failed", e); }
 }
 
 async function initPortfolio() {
-  // 1. Try to load remote state
+  // 1. Aggressive Remote Load (Cache Busting)
   try {
-    const res = await fetch('./state.json?t=' + Date.now());
+    const res = await fetch(`./state.json?v=${Date.now()}`);
     if (res.ok) {
       const remoteState = await res.json();
       state = { ...DEFAULT_STATE, ...remoteState };
-      console.log("Remote state loaded.");
+      console.log("Remote state synced.");
     }
   } catch (e) {
-    console.warn("Could not load remote state, using defaults.", e);
+    console.warn("Using default/local state.", e);
   }
 
-  // 2. Load from IndexedDB (Override with local edits)
-  try {
-    const local = await getLocal('osama_portfolio');
-    if (local) {
-      state = { ...state, ...local };
-    }
-  } catch (e) { console.error("IndexedDB load failed", e); }
+  // 2. Local Persistence (Highest priority for admin)
+  const local = await getLocal('osama_portfolio');
+  if (local) {
+    state = { ...state, ...local };
+  }
 
-  // 3. EXPLICIT CLEANUP (Prevents Secret Scanning blocks)
+  // 3. SECRETS CLEANUP
   if (state.settings) {
-    delete state.settings.ghToken;
-    delete state.settings.ghp;
-    save();
+    let changed = false;
+    ['ghToken', 'ghp', 'token', 'password'].forEach(k => {
+      if (state.settings[k]) { delete state.settings[k]; changed = true; }
+    });
+    if (changed) await save();
   }
 
   renderPortfolio();
