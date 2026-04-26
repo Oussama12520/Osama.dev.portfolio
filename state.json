@@ -1,9 +1,9 @@
 {
   "projects": [
     {
-      "id": 10,
+      "id": 12,
       "title": "Microservices Auth Platform",
-      "desc": "",
+      "desc": "egezr",
       "techs": [
         "Python",
         "FastAPI",
@@ -40,8 +40,8 @@
     "heroOutlineUrl": "",
     "ghRepo": "Oussama12520/Osama.dev.portfolio",
     "ghBranch": "main",
-    "adminHotkey": "CONTROL",
+    "adminHotkey": "V",
     "showAdminLink": true
   },
-  "nextId": 11
+  "nextId": 13
 }
