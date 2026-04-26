@@ -71,7 +71,33 @@ const DEFAULT_STATE = {
   nextId: 10
 };
 
-let state = JSON.parse(localStorage.getItem('osama_portfolio')) || DEFAULT_STATE;
+let state = DEFAULT_STATE;
+
+async function initPortfolio() {
+  // 1. Try to load remote state
+  try {
+    const res = await fetch('./state.json?t=' + Date.now());
+    if (res.ok) {
+      const remoteState = await res.json();
+      state = { ...DEFAULT_STATE, ...remoteState };
+      console.log("Remote state loaded.");
+    }
+  } catch (e) {
+    console.warn("Could not load remote state, using defaults.", e);
+  }
+
+  // 2. Merge local storage (highest priority for the admin)
+  const local = localStorage.getItem('osama_portfolio');
+  if (local) {
+    state = { ...state, ...JSON.parse(local) };
+  }
+
+  renderPortfolio();
+  if (isAdmin) updateDashboard();
+}
+
+// Call init on load
+initPortfolio();
 let isAdmin = false;
 let currentPanel = 'dashboard';
 let currentFilter = 'All';
@@ -651,6 +677,11 @@ async function syncToGitHub() {
     }
 
     status.textContent = '> Preparing data package...';
+    
+    // Robust UTF-8 to Base64
+    const utf8Json = encodeURIComponent(JSON.stringify(state, null, 2)).replace(/%([0-9A-F]{2})/g, (match, p1) => String.fromCharCode('0x' + p1));
+    const base64Content = btoa(utf8Json);
+
     // 2. Push update
     const putRes = await fetch(url, {
       method: 'PUT',
@@ -660,7 +691,7 @@ async function syncToGitHub() {
       },
       body: JSON.stringify({
         message: '🚀 Portfolio Update via Admin Panel',
-        content: btoa(unescape(encodeURIComponent(JSON.stringify(state, null, 2)))),
+        content: base64Content,
         sha: sha || undefined,
         branch: branch
       })
@@ -997,7 +1028,7 @@ if (termInput) {
   });
 }
 
-renderPortfolio();
+// renderPortfolio(); // Removed, handled by initPortfolio()
 setInterval(updateUptime, 1000);
 
 // Animate stat numbers
@@ -1008,7 +1039,7 @@ function animateNum(el, target) {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-  if (isAdmin) updateDashboard();
+  // if (isAdmin) updateDashboard(); // Removed, handled by initPortfolio()
   generateCaptcha();
 });
 
