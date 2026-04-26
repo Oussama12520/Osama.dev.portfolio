@@ -102,6 +102,12 @@ async function initPortfolio() {
     state = { ...state, ...JSON.parse(local) };
   }
 
+  // 3. EXPLICIT CLEANUP (Important: prevents Secret Scanning blocks)
+  if (state.settings && state.settings.ghToken) {
+    delete state.settings.ghToken;
+    save();
+  }
+
   renderPortfolio();
   if (isAdmin) updateDashboard();
 }
@@ -890,6 +896,9 @@ function saveSettings() {
   
   if (ghToken) localStorage.setItem('osama_portfolio_token', ghToken.value);
   if (ghBranch) s.ghBranch = ghBranch.value;
+
+  // Cleanup: ensure token never stays in main state
+  delete s.ghToken; 
 
   if (ghRepoInput) {
     let val = ghRepoInput.value.trim();
