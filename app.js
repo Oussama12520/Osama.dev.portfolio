@@ -1,3 +1,39 @@
+const DEFAULT_STATE = {
+  projects: [
+    { id: 1, title: "Microservices Auth Platform", desc: "Distributed authentication system with JWT, OAuth2, and role-based access control serving 500k+ daily requests. Built with async Python and Redis caching.", techs: ["Python", "FastAPI", "Redis", "PostgreSQL", "Docker"], demo: "", github: "", images: [], cat: "API" },
+    { id: 2, title: "Real-time Analytics Pipeline", desc: "Event-driven data pipeline processing 10M+ events/day using Kafka streams, with a GraphQL API layer and automated alerting system.", techs: ["Node.js", "Kafka", "GraphQL", "ClickHouse", "K8s"], demo: "", github: "", images: [], cat: "Microservice" },
+    { id: 3, title: "E-Commerce Backend API", desc: "Full-featured e-commerce API with inventory management, payment gateway integration, order tracking, and admin dashboard built in C# .NET.", techs: ["C#", ".NET 8", "SQL Server", "Stripe", "Azure"], demo: "", github: "", images: [], cat: "API" }
+  ],
+  certs: [
+    { id: 1, title: "AWS Certified Solutions Architect", issuer: "Amazon Web Services", date: "2024-03", img: "", emoji: "☁️" },
+    { id: 2, title: "MongoDB Certified Developer", issuer: "MongoDB University", date: "2023-11", img: "", emoji: "🗄️" }
+  ],
+  messages: [],
+  settings: {
+    github: "https://github.com/Oussama12520",
+    linkedin: "https://www.linkedin.com/in/oussemamasmoudi-a18151362/",
+    email: "oussemamasmoudi7@gmail.com",
+    discord: "https://discord.gg/RhpHd3Uyge",
+    telegram: "t.me/iOsama_0x1",
+    instagram: "https://www.instagram.com/ous7x_/",
+    skills: "Python,FastAPI,C#,.NET,Node.js,Express,PostgreSQL,MongoDB,Redis,Docker,Kubernetes,REST APIs,GraphQL,gRPC,JWT,OAuth2,System Design,Microservices,CI/CD,AWS,Linux",
+    bio: "I architect scalable backend systems and build APIs that power modern applications.",
+    photoAnimation: true,
+    statusWidget: true,
+    heroPrimaryText: "View Projects →",
+    heroPrimaryUrl: "#projects",
+    heroOutlineText: "Contact Me",
+    heroOutlineUrl: "#contact",
+    ghRepo: "Oussama12520/Osama.dev.portfolio",
+    ghBranch: "main",
+    adminHotkey: "L",
+    showAdminLink: true
+  },
+  nextId: 10
+};
+
+let state = DEFAULT_STATE;
+
 // ── GLOBAL ERROR HANDLING ──
 window.onerror = function(msg, url, line) {
   console.error("System Error:", msg, "at", url, ":", line);
