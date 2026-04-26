@@ -1,5 +1,26 @@
 {
   "projects": [],
   "certs": [],
-  "settings": {}
+  "messages": [],
+  "settings": {
+    "github": "undefined",
+    "linkedin": "undefined",
+    "email": "undefined",
+    "discord": "",
+    "telegram": "",
+    "instagram": "",
+    "skills": "undefined",
+    "bio": "undefined",
+    "photoAnimation": true,
+    "statusWidget": true,
+    "heroPrimaryText": "",
+    "heroPrimaryUrl": "",
+    "heroOutlineText": "",
+    "heroOutlineUrl": "",
+    "ghRepo": "Oussama12520/Osama.dev.portfolio",
+    "ghBranch": "main",
+    "adminHotkey": "L",
+    "showAdminLink": true
+  },
+  "nextId": 10
 }
