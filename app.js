@@ -691,8 +691,14 @@ async function syncToGitHub() {
 
     status.textContent = '> Preparing data package...';
     
+    // 1.5 STRIP SECRETS (Fail-safe for Secret Scanning)
+    const stateToPush = JSON.parse(JSON.stringify(state));
+    if (stateToPush.settings) {
+      delete stateToPush.settings.ghToken; // Ensure it's never in the JSON
+    }
+
     // Robust UTF-8 to Base64
-    const utf8Json = encodeURIComponent(JSON.stringify(state, null, 2)).replace(/%([0-9A-F]{2})/g, (match, p1) => String.fromCharCode('0x' + p1));
+    const utf8Json = encodeURIComponent(JSON.stringify(stateToPush, null, 2)).replace(/%([0-9A-F]{2})/g, (match, p1) => String.fromCharCode('0x' + p1));
     const base64Content = btoa(utf8Json);
 
     // 2. Push update (Clean URL, branch in body)
