@@ -183,7 +183,11 @@ async function initPortfolio() {
 
   renderPortfolio();
   if (isAdmin) updateDashboard();
-  console.log("💎 Osama Portfolio v6.3 Active");
+  
+  // Emergency Backdoor: ?login=1
+  if (window.location.search.includes('login=1')) openLogin();
+
+  console.log("💎 Osama Portfolio v6.5 Active");
 }
 
 // Call init on load
@@ -1075,13 +1079,14 @@ function updateStats() {
 }
 
 window.addEventListener('keydown', (e) => {
-  const s = state.settings;
-  const targetKey = (s.adminHotkey || 'L').toUpperCase();
-  if (e.altKey && e.key.toUpperCase() === targetKey) {
-    e.preventDefault();
-    document.getElementById('login-screen').classList.add('visible');
-    document.getElementById('login-user').focus();
-  }
+  try {
+    const s = (typeof state !== 'undefined' && state && state.settings) ? state.settings : {};
+    const targetKey = (s.adminHotkey || 'L').toUpperCase();
+    if (e.altKey && e.key.toUpperCase() === targetKey) {
+      e.preventDefault();
+      openLogin();
+    }
+  } catch (err) { console.warn("Hotkey error", err); }
 });
 
 // ── TOAST ──
