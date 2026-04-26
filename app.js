@@ -82,6 +82,49 @@ const DEFAULT_STATE = {
 
 let state = DEFAULT_STATE;
 
+// ── DATABASE (IndexedDB Upgrade) ──
+const DB_NAME = 'OsamaPortfolioDB';
+const STORE_NAME = 'state';
+
+function openDB() {
+  return new Promise((resolve, reject) => {
+    const request = indexedDB.open(DB_NAME, 1);
+    request.onupgradeneeded = () => request.result.createObjectStore(STORE_NAME);
+    request.onsuccess = () => resolve(request.result);
+    request.onerror = () => reject(request.error);
+  });
+}
+
+async function setLocal(key, value) {
+  const db = await openDB();
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction(STORE_NAME, 'readwrite');
+    tx.objectStore(STORE_NAME).put(value, key);
+    tx.oncomplete = () => resolve();
+    tx.onerror = () => reject(tx.error);
+  });
+}
+
+async function getLocal(key) {
+  const db = await openDB();
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction(STORE_NAME, 'readonly');
+    const request = tx.objectStore(STORE_NAME).get(key);
+    request.onsuccess = () => resolve(request.result);
+    request.onerror = () => reject(request.error);
+  });
+}
+
+async function clearLocal() {
+  const db = await openDB();
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction(STORE_NAME, 'readwrite');
+    tx.objectStore(STORE_NAME).clear();
+    tx.oncomplete = () => resolve();
+    tx.onerror = () => reject(tx.error);
+  });
+}
+
 async function initPortfolio() {
   // 1. Try to load remote state
   try {
@@ -89,20 +132,21 @@ async function initPortfolio() {
     if (res.ok) {
       const remoteState = await res.json();
       state = { ...DEFAULT_STATE, ...remoteState };
-      // Ensure settings from remote are preserved unless overridden by local
       console.log("Remote state loaded.");
     }
   } catch (e) {
     console.warn("Could not load remote state, using defaults.", e);
   }
 
-  // 2. Merge local storage (highest priority for the admin)
-  const local = localStorage.getItem('osama_portfolio');
-  if (local) {
-    state = { ...state, ...JSON.parse(local) };
-  }
+  // 2. Load from IndexedDB (Override with local edits)
+  try {
+    const local = await getLocal('osama_portfolio');
+    if (local) {
+      state = { ...state, ...local };
+    }
+  } catch (e) { console.error("IndexedDB load failed", e); }
 
-  // 3. EXPLICIT CLEANUP (Important: prevents Secret Scanning blocks)
+  // 3. EXPLICIT CLEANUP (Prevents Secret Scanning blocks)
   if (state.settings) {
     delete state.settings.ghToken;
     delete state.settings.ghp;
@@ -121,7 +165,9 @@ let currentFilter = 'All';
 let startTime = Date.now();
 let isTerminalOpen = false;
 
-function save() { localStorage.setItem('osama_portfolio', JSON.stringify(state)) }
+async function save() {
+  await setLocal('osama_portfolio', state);
+}
 
 // ── RENDER PORTFOLIO ──
 function renderPortfolio() {
@@ -866,14 +912,14 @@ function loadAdminSettings() {
   const telegram = document.getElementById('set-telegram');
   const instagram = document.getElementById('set-instagram');
 
-  if (github) github.value = s.github;
-  if (linkedin) linkedin.value = s.linkedin;
-  if (email) email.value = s.email;
+  if (github) github.value = s.github || '';
+  if (linkedin) linkedin.value = s.linkedin || '';
+  if (email) email.value = s.email || '';
   if (discord) discord.value = s.discord || '';
   if (telegram) telegram.value = s.telegram || '';
   if (instagram) instagram.value = s.instagram || '';
-  if (skills) skills.value = s.skills;
-  if (bio) bio.value = s.bio;
+  if (skills) skills.value = s.skills || '';
+  if (bio) bio.value = s.bio || '';
   if (photoAnim) photoAnim.checked = s.photoAnimation !== false;
   if (statusWidget) statusWidget.checked = s.statusWidget !== false;
 
@@ -962,9 +1008,10 @@ function saveSettings() {
   toast('Settings saved locally', 'success');
 }
 
-function wipeLocalData() {
+async function wipeLocalData() {
   if (confirm('EMERGENCY WIPE: This will delete all unsynced projects, messages, and settings from your browser memory. Are you sure?')) {
-    localStorage.removeItem('osama_portfolio');
+    await clearLocal();
+    localStorage.removeItem('osama_portfolio'); // Clean up old legacy storage too
     localStorage.removeItem('osama_portfolio_token');
     alert('Local data wiped. The page will now reload.');
     location.reload();
