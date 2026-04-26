@@ -570,8 +570,11 @@
             <div class="field-group"><label>Repository (user/repo)</label><input id="set-gh-repo" type="text" placeholder="Oussama12520/Osama.dev.portfolio" /></div>
             <div class="field-group"><label>Branch</label><input id="set-gh-branch" type="text" placeholder="main" /></div>
           </div>
+          <div style="display:flex;gap:10px;margin-top:10px">
+            <button class="btn btn-primary" style="flex:1" onclick="saveSettings()">Save Settings</button>
+            <button class="btn btn-danger" style="flex:0" onclick="wipeLocalData()" title="Emergency: Wipes local browser data if quota is exceeded">Wipe Local Data</button>
+          </div>
         </div>
-        <button class="btn btn-primary" onclick="saveSettings()">Save Settings</button>
       </div>
 
     </main>

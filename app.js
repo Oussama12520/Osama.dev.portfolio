@@ -529,6 +529,23 @@ function setProjectCover(imgEl) {
   badge.textContent = 'COVER';
   parent.appendChild(badge);
 }
+// Helper to compress massive images before saving to state
+function resizeImage(dataUrl, callback) {
+  const img = new Image();
+  img.onload = () => {
+    const maxSize = 800; // max width/height
+    let w = img.width, h = img.height;
+    if (w > h && w > maxSize) { h *= maxSize / w; w = maxSize; }
+    else if (h > maxSize) { w *= maxSize / h; h = maxSize; }
+    
+    const canvas = document.createElement('canvas');
+    canvas.width = w; canvas.height = h;
+    const ctx = canvas.getContext('2d');
+    ctx.drawImage(img, 0, 0, w, h);
+    callback(canvas.toDataURL('image/jpeg', 0.8));
+  };
+  img.src = dataUrl;
+}
 
 function handleMultipleUpload(input, gridId) {
   if (input.files) {
@@ -536,9 +553,26 @@ function handleMultipleUpload(input, gridId) {
     const wasEmpty = grid.children.length === 0;
     Array.from(input.files).forEach((file, idx) => {
       const reader = new FileReader();
-      reader.onload = e => addPreviewToGrid(e.target.result, gridId, wasEmpty && idx === 0);
+      reader.onload = e => {
+        resizeImage(e.target.result, (compressedBase64) => {
+          addPreviewToGrid(compressedBase64, gridId, wasEmpty && idx === 0);
+        });
+      };
       reader.readAsDataURL(file);
     });
+  }
+}
+
+function handleImageUpload(input, previewId) {
+  if (input.files && input.files[0]) {
+    const reader = new FileReader();
+    reader.onload = e => {
+      resizeImage(e.target.result, (compressedBase64) => {
+        const p = document.getElementById(previewId);
+        if(p) { p.style.display = 'block'; p.querySelector('img').src = compressedBase64; }
+      });
+    };
+    reader.readAsDataURL(input.files[0]);
   }
 }
 
@@ -924,11 +958,20 @@ function saveSettings() {
   const showLink = document.getElementById('set-show-admin-link');
   if (showLink) s.showAdminLink = showLink.checked;
 
-  save(); renderPortfolio();
-  toast('Settings saved!', 'success');
+  save(); renderPortfolio(); updateStats();
+  toast('Settings saved locally', 'success');
 }
 
-function captureHotkey() {
+function wipeLocalData() {
+  if (confirm('EMERGENCY WIPE: This will delete all unsynced projects, messages, and settings from your browser memory. Are you sure?')) {
+    localStorage.removeItem('osama_portfolio');
+    localStorage.removeItem('osama_portfolio_token');
+    alert('Local data wiped. The page will now reload.');
+    location.reload();
+  }
+}
+
+function updateStats() {
   const btn = document.getElementById('btn-capture-hotkey');
   const display = document.getElementById('set-hotkey-val');
   btn.textContent = '... Press any key ...';
