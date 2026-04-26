@@ -960,10 +960,8 @@ function loadAdminSettings() {
   if (hoText) hoText.value = s.heroOutlineText || '';
   if (hoUrl) hoUrl.value = s.heroOutlineUrl || '';
 
-  const ghToken = document.getElementById('set-gh-token');
   const ghRepo = document.getElementById('set-gh-repo');
   const ghBranch = document.getElementById('set-gh-branch');
-  if (ghToken) ghToken.value = s.ghToken || '';
   if (ghRepo) ghRepo.value = s.ghRepo || '';
   if (ghBranch) ghBranch.value = s.ghBranch || '';
 
