@@ -90,6 +90,7 @@ async function initPortfolio() {
     if (res.ok) {
       const remoteState = await res.json();
       state = { ...DEFAULT_STATE, ...remoteState };
+      // Ensure settings from remote are preserved unless overridden by local
       console.log("Remote state loaded.");
     }
   } catch (e) {
@@ -869,11 +870,20 @@ function saveSettings() {
   if (hoUrl) s.heroOutlineUrl = hoUrl.value;
 
   const ghToken = document.getElementById('set-gh-token');
-  const ghRepo = document.getElementById('set-gh-repo');
+  const ghRepoInput = document.getElementById('set-gh-repo');
   const ghBranch = document.getElementById('set-gh-branch');
+  
   if (ghToken) s.ghToken = ghToken.value;
-  if (ghRepo) s.ghRepo = ghRepo.value;
   if (ghBranch) s.ghBranch = ghBranch.value;
+
+  if (ghRepoInput) {
+    let val = ghRepoInput.value.trim();
+    if (val.includes('github.com/')) {
+      val = val.split('github.com/')[1].split('?')[0].split('#')[0];
+      if (val.endsWith('.git')) val = val.slice(0, -4);
+    }
+    s.ghRepo = val;
+  }
 
   const hotkey = document.getElementById('set-hotkey-val');
   if (hotkey) s.adminHotkey = hotkey.textContent;
