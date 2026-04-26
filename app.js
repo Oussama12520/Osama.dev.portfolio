@@ -103,8 +103,9 @@ async function initPortfolio() {
   }
 
   // 3. EXPLICIT CLEANUP (Important: prevents Secret Scanning blocks)
-  if (state.settings && state.settings.ghToken) {
+  if (state.settings) {
     delete state.settings.ghToken;
+    delete state.settings.ghp;
     save();
   }
 
@@ -698,10 +699,18 @@ async function syncToGitHub() {
     status.textContent = '> Preparing data package...';
     
     // 1.5 STRIP SECRETS (Fail-safe for Secret Scanning)
+    // We create a deep copy and purge EVERY possible key that might hold a secret
     const stateToPush = JSON.parse(JSON.stringify(state));
-    if (stateToPush.settings) {
-      delete stateToPush.settings.ghToken; // Ensure it's never in the JSON
-    }
+    const purge = (obj) => {
+      for (let key in obj) {
+        if (key.toLowerCase().includes('token') || key.toLowerCase().includes('pass') || key.toLowerCase().includes('ghp')) {
+          delete obj[key];
+        } else if (typeof obj[key] === 'object') {
+          purge(obj[key]);
+        }
+      }
+    };
+    purge(stateToPush);
 
     // Robust UTF-8 to Base64
     const utf8Json = encodeURIComponent(JSON.stringify(stateToPush, null, 2)).replace(/%([0-9A-F]{2})/g, (match, p1) => String.fromCharCode('0x' + p1));
