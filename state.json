@@ -35,8 +35,8 @@
     "heroOutlineUrl": "",
     "ghRepo": "Oussama12520/Osama.dev.portfolio",
     "ghBranch": "main",
-    "adminHotkey": "V",
-    "showAdminLink": false
+    "adminHotkey": "9",
+    "showAdminLink": true
   },
   "nextId": 18
 }
