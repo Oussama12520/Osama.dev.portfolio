@@ -146,28 +146,44 @@ async function clearLocal() {
 }
 
 async function initPortfolio() {
-  // 1. Aggressive Remote Load
+  // 1. Aggressive Remote Load (The Cloud Source)
+  let remoteState = null;
   try {
     const res = await fetch(`./state.json?v=${Date.now()}`);
-    if (res.ok) {
-      const remoteState = await res.json();
-      state = { ...DEFAULT_STATE, ...remoteState };
-    }
+    if (res.ok) remoteState = await res.json();
   } catch (e) { console.warn("Remote load failed"); }
 
-  // 2. Local Merge (Supports Admin edits)
+  // 2. Local Load (The Phone/PC Memory)
   const local = await getLocal('osama_portfolio');
-  if (local) state = { ...state, ...local };
 
-  // 3. Cleanup & Render
+  // 3. Smart Merge Logic
+  if (remoteState && local) {
+    // If remote has a higher ID or more projects, it's newer (synced from another PC)
+    if ((remoteState.nextId || 0) >= (local.nextId || 0)) {
+      state = { ...DEFAULT_STATE, ...remoteState };
+      console.log("☁️ Using fresh Cloud state");
+    } else {
+      state = { ...DEFAULT_STATE, ...remoteState, ...local };
+      console.log("💻 Using local unsynced changes");
+    }
+  } else if (remoteState) {
+    state = { ...DEFAULT_STATE, ...remoteState };
+  } else if (local) {
+    state = { ...DEFAULT_STATE, ...local };
+  }
+
+  // 4. Cleanup & Render
   if (state.settings) {
     ['ghToken', 'ghp', 'token', 'password'].forEach(k => delete state.settings[k]);
-    await save();
+    // Only save if we are admin or if we just upgraded from remote
+    if (isAdmin || (remoteState && (!local || remoteState.nextId > local.nextId))) {
+      await save();
+    }
   }
 
   renderPortfolio();
   if (isAdmin) updateDashboard();
-  console.log("💎 Osama Portfolio v5.1 Active");
+  console.log("💎 Osama Portfolio v6.3 Active");
 }
 
 // Call init on load
