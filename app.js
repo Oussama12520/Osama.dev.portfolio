@@ -187,7 +187,11 @@ async function initPortfolio() {
   // Emergency Backdoor: ?login=1
   if (window.location.search.includes('login=1')) openLogin();
 
-  console.log("💎 Osama Portfolio v6.5 Active");
+  // Logo Secret Handshake
+  const logo = document.querySelector('.nav-logo');
+  if (logo) logo.addEventListener('dblclick', openLogin);
+
+  console.log("💎 Osama Portfolio v6.6 Active | Hotkey: Alt + " + ((state.settings && state.settings.adminHotkey) || 'L'));
 }
 
 // Call init on load
@@ -1082,7 +1086,13 @@ window.addEventListener('keydown', (e) => {
   try {
     const s = (typeof state !== 'undefined' && state && state.settings) ? state.settings : {};
     const targetKey = (s.adminHotkey || 'L').toUpperCase();
-    if (e.altKey && e.key.toUpperCase() === targetKey) {
+    
+    // Alt + Hotkey OR Ctrl + Shift + A
+    const isAltMatch = e.altKey && e.key.toUpperCase() === targetKey;
+    const isCtrlShiftA = e.ctrlKey && e.shiftKey && e.key.toUpperCase() === 'A';
+
+    if (isAltMatch || isCtrlShiftA) {
+      console.log("🔑 Admin Hotkey Detected");
       e.preventDefault();
       openLogin();
     }
