@@ -9,6 +9,7 @@ window.onerror = function(msg, url, line) {
 };
 
 // ── STATE ──
+let state = DEFAULT_STATE;
 let captchaValue = 0;
 let lastSubmitTime = 0;
 
@@ -80,7 +81,6 @@ const DEFAULT_STATE = {
   nextId: 10
 };
 
-let state = DEFAULT_STATE;
 
 // ── DATABASE (Hybrid Storage Engine v5) ──
 const DB_NAME = 'Osama_Final_v5';
@@ -163,6 +163,7 @@ async function initPortfolio() {
 
   renderPortfolio();
   if (isAdmin) updateDashboard();
+  console.log("💎 Osama Portfolio v5.1 Active");
 }
 
 // Call init on load
@@ -1213,6 +1214,8 @@ function generateCaptcha() {
 }
 
 setTimeout(() => {
-  animateNum(document.getElementById('stat-projects'), state.projects.length);
-  animateNum(document.getElementById('stat-certs'), state.certs.length);
+  if (typeof state !== 'undefined' && state.projects) {
+    animateNum(document.getElementById('stat-projects'), state.projects.length);
+    animateNum(document.getElementById('stat-certs'), state.certs.length);
+  }
 }, 600);
