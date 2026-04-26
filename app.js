@@ -1,3 +1,13 @@
+// ── GLOBAL ERROR HANDLING ──
+window.onerror = function(msg, url, line) {
+  console.error("System Error:", msg, "at", url, ":", line);
+  const status = document.getElementById('last-activity');
+  if (status) {
+    status.textContent = "Error: " + msg.substring(0, 20);
+    status.style.color = "var(--red)";
+  }
+};
+
 // ── STATE ──
 let captchaValue = 0;
 let lastSubmitTime = 0;
