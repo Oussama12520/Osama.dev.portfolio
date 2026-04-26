@@ -80,25 +80,25 @@ const DEFAULT_STATE = {
   nextId: 10
 };
 
-// ── DATABASE (Unique v4 Upgrade) ──
-const DB_NAME = 'Osama_Portfolio_v4';
+let state = DEFAULT_STATE;
+
+// ── DATABASE (Hybrid Storage Engine v5) ──
+const DB_NAME = 'Osama_Final_v5';
 const STORE_NAME = 'state';
 
+// This system uses IndexedDB for large data (images) 
+// but falls back to LocalStorage if the DB is blocked.
 function openDB() {
   return new Promise((resolve, reject) => {
     try {
       const request = indexedDB.open(DB_NAME, 1);
       request.onupgradeneeded = () => {
         const db = request.result;
-        if (!db.objectStoreNames.contains(STORE_NAME)) {
-          db.createObjectStore(STORE_NAME);
-        }
+        if (!db.objectStoreNames.contains(STORE_NAME)) db.createObjectStore(STORE_NAME);
       };
       request.onsuccess = () => resolve(request.result);
       request.onerror = () => reject(request.error);
-    } catch (e) {
-      reject(e);
-    }
+    } catch (e) { reject(e); }
   });
 }
 
@@ -111,7 +111,10 @@ async function setLocal(key, value) {
       tx.oncomplete = () => resolve();
       tx.onerror = () => reject(tx.error);
     });
-  } catch (e) { console.error("setLocal failed", e); }
+  } catch (e) { 
+    console.warn("DB fallback to LocalStorage");
+    localStorage.setItem(key, JSON.stringify(value));
+  }
 }
 
 async function getLocal(key) {
@@ -124,49 +127,38 @@ async function getLocal(key) {
       request.onerror = () => reject(request.error);
     });
   } catch (e) { 
-    console.error("getLocal failed", e); 
-    return null;
+    const data = localStorage.getItem(key);
+    return data ? JSON.parse(data) : null;
   }
 }
 
 async function clearLocal() {
   try {
     const db = await openDB();
-    return new Promise((resolve, reject) => {
-      const tx = db.transaction(STORE_NAME, 'readwrite');
-      tx.objectStore(STORE_NAME).clear();
-      tx.oncomplete = () => resolve();
-      tx.onerror = () => reject(tx.error);
-    });
-  } catch (e) { console.error("clearLocal failed", e); }
+    const tx = db.transaction(STORE_NAME, 'readwrite');
+    tx.objectStore(STORE_NAME).clear();
+    localStorage.removeItem('osama_portfolio');
+  } catch (e) { localStorage.removeItem('osama_portfolio'); }
 }
 
 async function initPortfolio() {
-  // 1. Aggressive Remote Load (Cache Busting)
+  // 1. Aggressive Remote Load
   try {
     const res = await fetch(`./state.json?v=${Date.now()}`);
     if (res.ok) {
       const remoteState = await res.json();
       state = { ...DEFAULT_STATE, ...remoteState };
-      console.log("Remote state synced.");
     }
-  } catch (e) {
-    console.warn("Using default/local state.", e);
-  }
+  } catch (e) { console.warn("Remote load failed"); }
 
-  // 2. Local Persistence (Highest priority for admin)
+  // 2. Local Merge (Supports Admin edits)
   const local = await getLocal('osama_portfolio');
-  if (local) {
-    state = { ...state, ...local };
-  }
+  if (local) state = { ...state, ...local };
 
-  // 3. SECRETS CLEANUP
+  // 3. Cleanup & Render
   if (state.settings) {
-    let changed = false;
-    ['ghToken', 'ghp', 'token', 'password'].forEach(k => {
-      if (state.settings[k]) { delete state.settings[k]; changed = true; }
-    });
-    if (changed) await save();
+    ['ghToken', 'ghp', 'token', 'password'].forEach(k => delete state.settings[k]);
+    await save();
   }
 
   renderPortfolio();
