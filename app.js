@@ -9,7 +9,6 @@ window.onerror = function(msg, url, line) {
 };
 
 // ── STATE ──
-let state = DEFAULT_STATE;
 let captchaValue = 0;
 let lastSubmitTime = 0;
 
@@ -80,6 +79,8 @@ const DEFAULT_STATE = {
   },
   nextId: 10
 };
+
+let state = DEFAULT_STATE;
 
 
 // ── DATABASE (Hybrid Storage Engine v5) ──
