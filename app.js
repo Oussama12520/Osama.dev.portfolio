@@ -672,10 +672,10 @@ async function syncToGitHub() {
     status.textContent = '> Fetching repository info...';
 
     const branch = s.ghBranch || 'main';
-    const url = `https://api.github.com/repos/${s.ghRepo}/contents/state.json?ref=${branch}`;
+    const baseUrl = `https://api.github.com/repos/${s.ghRepo}/contents/state.json`;
     
-    // 1. Get current file SHA
-    const getRes = await fetch(url, {
+    // 1. Get current file SHA (with cache buster to avoid 409)
+    const getRes = await fetch(`${baseUrl}?ref=${branch}&t=${Date.now()}`, {
       headers: { 'Authorization': `token ${s.ghToken}` }
     });
 
@@ -684,7 +684,8 @@ async function syncToGitHub() {
       const data = await getRes.json();
       sha = data.sha;
     } else if (getRes.status !== 404) {
-      throw new Error(`GitHub API Error: ${getRes.statusText}`);
+      const errData = await getRes.json().catch(() => ({}));
+      throw new Error(`Fetch SHA failed: ${getRes.status} ${errData.message || getRes.statusText}`);
     }
 
     status.textContent = '> Preparing data package...';
@@ -693,8 +694,8 @@ async function syncToGitHub() {
     const utf8Json = encodeURIComponent(JSON.stringify(state, null, 2)).replace(/%([0-9A-F]{2})/g, (match, p1) => String.fromCharCode('0x' + p1));
     const base64Content = btoa(utf8Json);
 
-    // 2. Push update
-    const putRes = await fetch(url, {
+    // 2. Push update (Clean URL, branch in body)
+    const putRes = await fetch(baseUrl, {
       method: 'PUT',
       headers: {
         'Authorization': `token ${s.ghToken}`,
