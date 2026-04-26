@@ -971,19 +971,33 @@ function wipeLocalData() {
   }
 }
 
-function updateStats() {
+function captureHotkey() {
   const btn = document.getElementById('btn-capture-hotkey');
   const display = document.getElementById('set-hotkey-val');
+  if (!btn || !display) return;
   btn.textContent = '... Press any key ...';
   
   const handler = (e) => {
     e.preventDefault();
+    if (!e.key) return;
     const key = e.key.toUpperCase();
     display.textContent = key;
     btn.textContent = 'Change Hotkey';
     window.removeEventListener('keydown', handler);
   };
   window.addEventListener('keydown', handler);
+}
+
+function updateStats() {
+  const p = document.getElementById('stat-projects');
+  const c = document.getElementById('stat-certs');
+  const m = document.getElementById('stat-messages');
+  const u = document.getElementById('stat-unread');
+  
+  if (p) p.textContent = state.projects.length;
+  if (c) c.textContent = state.certs.length;
+  if (m) m.textContent = state.messages.length;
+  if (u) u.textContent = state.messages.filter(msg => !msg.read).length;
 }
 
 window.addEventListener('keydown', (e) => {
@@ -1005,19 +1019,7 @@ function toast(msg, type = 'success') {
 }
 
 // ── IMAGE UPLOAD ──
-function handleImageUpload(input, previewId) {
-  if (input.files && input.files[0]) {
-    const reader = new FileReader();
-    reader.onload = function (e) {
-      const preview = document.getElementById(previewId);
-      if (preview) {
-        preview.style.display = 'block';
-        preview.querySelector('img').src = e.target.result;
-      }
-    };
-    reader.readAsDataURL(input.files[0]);
-  }
-}
+// Image upload logic moved above with compression helper
 
 // ── PROJECT DETAIL ──
 function openProjectDetail(id) {
