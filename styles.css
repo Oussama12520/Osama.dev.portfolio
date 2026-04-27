@@ -1963,21 +1963,26 @@ body.admin-active .terminal-container {
   .projects-grid::-webkit-scrollbar { display: none; }
   
   .project-card {
-    min-width: 75vw;
+    min-width: 65vw;
     scroll-snap-align: center;
     flex-shrink: 0;
   }
   
   .project-img {
-    height: 160px !important;
+    height: 130px !important;
   }
   
   .project-body {
-    padding: 16px;
+    padding: 12px;
   }
   
   .project-title {
-    font-size: 16px;
+    font-size: 15px;
+    margin-bottom: 4px;
+  }
+
+  .project-desc, .project-links {
+    display: none;
   }
   
   /* CERTS CAROUSEL (MOBILE) */
