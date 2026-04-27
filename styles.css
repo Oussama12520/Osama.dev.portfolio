@@ -1932,6 +1932,22 @@ body.admin-active .terminal-container {
   
   .hero-social { display: none; } /* Hide the social grid as requested */
   
+  /* CONTACT SOCIAL LINKS */
+  .social-links {
+    grid-template-columns: 1fr;
+    gap: 12px;
+    margin-top: 40px;
+  }
+  
+  .social-link {
+    padding: 16px 20px;
+    background: rgba(13, 17, 28, 0.6);
+    backdrop-filter: blur(10px);
+  }
+  
+  .social-name { font-size: 16px; font-weight: 700; }
+  .social-handle { font-size: 13px; color: var(--text2); }
+  
   /* GRIDS */
   .projects-grid { grid-template-columns: 1fr; }
   .certs-grid { grid-template-columns: 1fr; }
