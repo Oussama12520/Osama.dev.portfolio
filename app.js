@@ -519,7 +519,7 @@ function closeLogin2() { document.getElementById('login-screen').classList.remov
 
 // ── ADMIN PANELS ──
 function showPanel(p) {
-  ['dashboard', 'projects', 'certs', 'messages', 'settings'].forEach(n => {
+  ['dashboard', 'projects', 'certs', 'gallery', 'messages', 'settings'].forEach(n => {
     const panel = document.getElementById('panel-' + n);
     const nav = document.getElementById('nav-' + n);
     if (panel) panel.style.display = n === p ? 'block' : 'none';
@@ -529,6 +529,7 @@ function showPanel(p) {
   if (p === 'messages') renderAdminMessages();
   if (p === 'projects') renderAdminProjects();
   if (p === 'certs') renderAdminCerts();
+  if (p === 'gallery') renderAdminGallery();
 }
 
 // ── ADMIN PROJECTS ──
