@@ -1963,18 +1963,17 @@ body.admin-active .terminal-container {
   .projects-grid::-webkit-scrollbar { display: none; }
   
   .project-card {
-    min-width: 65vw;
+    min-width: 75vw;
     scroll-snap-align: center;
     flex-shrink: 0;
   }
   
   .project-img {
-    height: auto !important;
-    aspect-ratio: 16 / 9;
+    height: 160px !important;
   }
   
   .project-body {
-    padding: 12px;
+    padding: 16px;
   }
   
   .project-title {
