@@ -12,6 +12,7 @@ var DEFAULT_STATE = {
     { id: 2, title: "MongoDB Certified Developer", issuer: "MongoDB University", date: "2023-11", img: "", emoji: "🗄️" }
   ],
   messages: [],
+  gallery: [],
   settings: {
     github: "https://github.com/Oussama12520",
     linkedin: "https://www.linkedin.com/in/oussama-mansouri-019623291/",
@@ -1253,6 +1254,154 @@ function generateCaptcha() {
     }
   }, 600);
 
+// ── GALLERY ──
+function renderGallery() {
+  const grid = document.getElementById('gallery-grid');
+  if (!grid) return;
+  if (!state.gallery || state.gallery.length === 0) {
+    grid.innerHTML = '<div class="empty-state"><h3>No photos yet.</h3><p>Upload some photos from the Admin panel!</p></div>';
+    return;
+  }
+  grid.innerHTML = state.gallery.map(item => `
+    <div class="gallery-item" onclick="openGalleryModal(${item.id})">
+      <img src="${item.img}" alt="${item.title}" loading="lazy">
+      <div class="gallery-overlay">
+        <div class="gallery-info">
+          <h3>${item.title}</h3>
+          <div class="gallery-likes">❤️ ${item.likes || 0}</div>
+        </div>
+      </div>
+    </div>
+  `).join('');
+}
+
+let currentGalleryId = null;
+function openGalleryModal(id) {
+  const item = state.gallery.find(x => x.id === id);
+  if (!item) return;
+  currentGalleryId = id;
+  const img = document.getElementById('gm-img');
+  if(img) img.src = item.img;
+  const title = document.getElementById('gm-title');
+  if(title) title.textContent = item.title;
+  const desc = document.getElementById('gm-desc');
+  if(desc) desc.textContent = item.desc;
+  const likes = document.getElementById('gm-likes');
+  if(likes) likes.textContent = `❤️ ${item.likes || 0} Likes`;
+  const modal = document.getElementById('gallery-modal');
+  if(modal) modal.style.display = 'flex';
+}
+
+function closeGalleryModal() {
+  const modal = document.getElementById('gallery-modal');
+  if(modal) modal.style.display = 'none';
+}
+
+async function likeGalleryItem(id) {
+  const item = state.gallery.find(x => x.id === id);
+  if (!item) return;
+  
+  const liked = JSON.parse(localStorage.getItem('osama_liked') || '[]');
+  if (liked.includes(id)) return;
+  
+  item.likes = (item.likes || 0) + 1;
+  liked.push(id);
+  localStorage.setItem('osama_liked', JSON.stringify(liked));
+  
+  await setLocal('state', state);
+  renderGallery();
+  const likes = document.getElementById('gm-likes');
+  if (currentGalleryId === id && likes) {
+    likes.textContent = `❤️ ${item.likes} Likes`;
+  }
+}
+
+// ── ADMIN GALLERY ──
+function openGalleryForm() {
+  document.getElementById('gallery-form-title').textContent = 'Add Photo';
+  document.getElementById('gallery-edit-id').value = '';
+  document.getElementById('gf-title').value = '';
+  document.getElementById('gf-desc').value = '';
+  document.getElementById('gf-preview').style.display = 'none';
+  document.getElementById('gallery-form-overlay').style.display = 'flex';
+}
+
+function closeGalleryForm() {
+  document.getElementById('gallery-form-overlay').style.display = 'none';
+}
+
+async function saveGalleryItem() {
+  const id = document.getElementById('gallery-edit-id').value;
+  const title = document.getElementById('gf-title').value;
+  const desc = document.getElementById('gf-desc').value;
+  const imgEl = document.getElementById('gf-preview').querySelector('img');
+  const img = imgEl.src;
+
+  if (!title || !img) return alert("Title and Image are required!");
+
+  if (id) {
+    const idx = state.gallery.findIndex(x => x.id == id);
+    state.gallery[idx] = { ...state.gallery[idx], title, desc, img };
+  } else {
+    state.gallery.push({ id: Date.now(), title, desc, img, likes: 0 });
+  }
+
+  await setLocal('state', state);
+  closeGalleryForm();
+  renderAdminGallery();
+  renderGallery();
+}
+
+function renderAdminGallery() {
+  const list = document.getElementById('admin-gallery-list');
+  if (!list) return;
+  list.innerHTML = state.gallery.map(item => `
+    <div class="admin-card">
+      <img src="${item.img}" style="width:100%; height:120px; object-fit:cover; border-radius:var(--r); margin-bottom:10px">
+      <h3 style="font-size:14px; margin-bottom:4px">${item.title}</h3>
+      <p style="font-size:12px; color:var(--text3); margin-bottom:12px">${item.desc ? item.desc.substring(0, 50) : ''}...</p>
+      <div class="actions">
+        <button class="btn btn-icon btn-sm" onclick="editGalleryItem(${item.id})">✏️</button>
+        <button class="btn btn-danger btn-sm" onclick="deleteGalleryItem(${item.id})">🗑</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+function editGalleryItem(id) {
+  const item = state.gallery.find(x => x.id === id);
+  if (!item) return;
+  document.getElementById('gallery-form-title').textContent = 'Edit Photo';
+  document.getElementById('gallery-edit-id').value = item.id;
+  document.getElementById('gf-title').value = item.title;
+  document.getElementById('gf-desc').value = item.desc || '';
+  const preview = document.getElementById('gf-preview');
+  preview.querySelector('img').src = item.img;
+  preview.style.display = 'block';
+  document.getElementById('gallery-form-overlay').style.display = 'flex';
+}
+
+async function deleteGalleryItem(id) {
+  if (!confirm("Are you sure?")) return;
+  state.gallery = state.gallery.filter(x => x.id !== id);
+  await setLocal('state', state);
+  renderAdminGallery();
+  renderGallery();
+}
+
+// Update renderPortfolio and updateDashboard (Hooks)
+const oldRP = renderPortfolio;
+window.renderPortfolio = function() {
+  if(oldRP) oldRP();
+  renderGallery();
+};
+
+const oldUD = updateDashboard;
+window.updateDashboard = function() {
+  if(oldUD) oldUD();
+  renderAdminGallery();
+}
+
   // Expose necessary functions to window
   window.openLogin = openLogin;
   window.closeLogin = closeLogin;
@@ -1286,5 +1435,13 @@ function generateCaptcha() {
   window.handleImageUpload = handleImageUpload;
   window.handleMultipleUpload = handleMultipleUpload;
   window.setProjectCover = setProjectCover;
+  window.openGalleryForm = openGalleryForm;
+  window.closeGalleryForm = closeGalleryForm;
+  window.saveGalleryItem = saveGalleryItem;
+  window.editGalleryItem = editGalleryItem;
+  window.deleteGalleryItem = deleteGalleryItem;
+  window.openGalleryModal = openGalleryModal;
+  window.closeGalleryModal = closeGalleryModal;
+  window.likeGalleryItem = likeGalleryItem;
 
 })();
