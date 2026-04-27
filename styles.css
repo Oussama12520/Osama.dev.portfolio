@@ -1968,6 +1968,11 @@ body.admin-active .terminal-container {
     flex-shrink: 0;
   }
   
+  .project-img {
+    height: auto !important;
+    aspect-ratio: 16 / 9;
+  }
+  
   /* CERTS CAROUSEL (MOBILE) */
   .certs-grid { 
     display: flex;
