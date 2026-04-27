@@ -1896,26 +1896,27 @@ body.admin-active .terminal-container {
   .hero-btns .btn { width: 100%; justify-content: center; }
   
   .hero-photo {
-    position: relative;
-    top: 0;
-    right: 0;
-    transform: none !important;
-    width: 140px;
-    height: 140px;
-    margin-bottom: 24px;
-    opacity: 1;
-    border: 3px solid var(--accent);
-    box-shadow: 0 0 30px rgba(0, 212, 255, 0.3), inset 0 0 15px rgba(0, 212, 255, 0.2);
-    mask-image: none;
-    -webkit-mask-image: none;
-    filter: none;
-    order: -1;
-    animation: floatingAvatar 4s ease-in-out infinite;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) !important;
+    width: 320px;
+    height: 320px;
+    margin: 0;
+    opacity: 0.15;
+    border: none;
+    box-shadow: none;
+    filter: grayscale(100%) contrast(1.1);
+    mask-image: radial-gradient(circle at center, black 20%, transparent 75%);
+    -webkit-mask-image: radial-gradient(circle at center, black 20%, transparent 75%);
+    z-index: 1;
+    pointer-events: none;
+    animation: photoBeatMobile 6s ease-in-out infinite;
   }
   
-  @keyframes floatingAvatar {
-    0%, 100% { transform: translateY(0) scale(1); }
-    50% { transform: translateY(-8px) scale(1.02); }
+  @keyframes photoBeatMobile {
+    0%, 100% { transform: translate(-50%, -50%) scale(1); opacity: 0.15; }
+    50% { transform: translate(-50%, -52%) scale(1.1); opacity: 0.2; }
   }
   
   .hero-stats { 
