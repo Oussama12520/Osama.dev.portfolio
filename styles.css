@@ -1948,9 +1948,43 @@ body.admin-active .terminal-container {
   .social-name { font-size: 16px; font-weight: 700; }
   .social-handle { font-size: 13px; color: var(--text2); }
   
-  /* GRIDS */
-  .projects-grid { grid-template-columns: 1fr; }
-  .certs-grid { grid-template-columns: 1fr; }
+  /* PROJECTS CAROUSEL (MOBILE) */
+  .projects-grid { 
+    display: flex;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    gap: 16px;
+    padding: 20px 20px 40px;
+    margin: 0 -20px;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+  .projects-grid::-webkit-scrollbar { display: none; }
+  
+  .project-card {
+    min-width: 85vw;
+    scroll-snap-align: center;
+    flex-shrink: 0;
+  }
+  
+  /* CERTS CAROUSEL (MOBILE) */
+  .certs-grid { 
+    display: flex;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    gap: 16px;
+    padding: 20px 20px 40px;
+    margin: 0 -20px;
+    scrollbar-width: none;
+  }
+  .certs-grid::-webkit-scrollbar { display: none; }
+  .cert-card { 
+    min-width: 75vw; 
+    scroll-snap-align: center;
+    flex-shrink: 0;
+  }
   .about-grid { gap: 40px; }
   
   /* MODALS */
