@@ -1964,8 +1964,10 @@ body.admin-active .terminal-container {
   
   .project-card {
     min-width: 75vw;
+    height: 240px !important;
     scroll-snap-align: center;
     flex-shrink: 0;
+    overflow: hidden;
   }
   
   .project-img {
