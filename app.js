@@ -1,6 +1,13 @@
 (function() {
 "use strict";
 
+  // Expose necessary functions to window IMMEDIATELY
+  window.openLogin = () => {}; // Placeholder until defined
+  window.closeLogin = () => {}; 
+  // ... better to move actual exposure here after functions are defined.
+  // Actually, let's just fix the crash at the bottom.
+
+
 var DEFAULT_STATE = {
   projects: [
     { id: 1, title: "Microservices Auth Platform", desc: "Distributed authentication system with JWT, OAuth2, and role-based access control serving 500k+ daily requests. Built with async Python and Redis caching.", techs: ["Python", "FastAPI", "Redis", "PostgreSQL", "Docker"], demo: "", github: "", images: [], cat: "API" },
@@ -183,7 +190,7 @@ async function initPortfolio() {
   }
 
   renderPortfolio();
-  if (isAdmin) updateDashboard();
+  if (isAdmin) updateStats();
   
   // Emergency Backdoor: ?login=1
   if (window.location.search.includes('login=1')) openLogin();
@@ -213,6 +220,7 @@ function renderPortfolio() {
   renderProjects();
   renderCerts();
   renderSocials();
+  renderGallery();
   updateStats();
 
   const adminLink = document.getElementById('admin-login-link');
@@ -411,6 +419,7 @@ function updateStats() {
     if (ub) {
       if (unread) { ub.style.display = 'inline'; ub.textContent = unread } else { ub.style.display = 'none' }
     }
+    renderAdminGallery();
   }
 }
 
@@ -1388,19 +1397,6 @@ async function deleteGalleryItem(id) {
   await setLocal('state', state);
   renderAdminGallery();
   renderGallery();
-}
-
-// Update renderPortfolio and updateDashboard (Hooks)
-const oldRP = renderPortfolio;
-window.renderPortfolio = function() {
-  if(oldRP) oldRP();
-  renderGallery();
-};
-
-const oldUD = updateDashboard;
-window.updateDashboard = function() {
-  if(oldUD) oldUD();
-  renderAdminGallery();
 }
 
   // Expose necessary functions to window
