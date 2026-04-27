@@ -1963,14 +1963,14 @@ body.admin-active .terminal-container {
   .projects-grid::-webkit-scrollbar { display: none; }
   
   .project-card {
-    min-width: 85vw;
+    min-width: 80vw;
     scroll-snap-align: center;
     flex-shrink: 0;
   }
   
   .project-img {
     height: auto !important;
-    aspect-ratio: 16 / 9;
+    aspect-ratio: 16 / 8;
   }
   
   /* CERTS CAROUSEL (MOBILE) */
