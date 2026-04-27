@@ -1969,7 +1969,8 @@ body.admin-active .terminal-container {
   }
   
   .project-img {
-    height: 130px !important;
+    height: auto !important;
+    aspect-ratio: 16 / 9;
   }
   
   .project-body {
