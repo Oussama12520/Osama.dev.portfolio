@@ -2163,8 +2163,24 @@ body.admin-active .terminal-container {
   /* MODALS */
   .modal {
     width: 95%;
-    padding: 20px;
+    padding: 16px;
     max-height: 95vh;
+  }
+
+  #pd-title {
+    font-size: 18px !important;
+    margin-bottom: 4px !important;
+  }
+
+  #pd-desc {
+    font-size: 13px !important;
+    line-height: 1.4 !important;
+    margin-bottom: 15px !important;
+  }
+
+  .tech-tag {
+    font-size: 9px !important;
+    padding: 2px 6px !important;
   }
 
   .modal-lg {
