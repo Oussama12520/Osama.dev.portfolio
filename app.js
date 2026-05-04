@@ -4,6 +4,15 @@
   // Expose necessary functions to window IMMEDIATELY
   window.openLogin = () => {}; // Placeholder until defined
   window.closeLogin = () => {}; 
+  
+  // ── CAROUSEL SCROLL ──
+  window.scrollCarousel = function(id, dir) {
+    const g = document.getElementById(id);
+    if (!g) return;
+    const scrollAmount = 340 + 24; // card width + gap
+    g.scrollBy({ left: dir * scrollAmount, behavior: 'smooth' });
+  };
+
   // ... better to move actual exposure here after functions are defined.
   // Actually, let's just fix the crash at the bottom.
 
@@ -266,6 +275,9 @@ function renderProjects() {
     });
   }
 
+  // Carousel logic: if more than 3, add class
+  g.classList.toggle('is-carousel', filtered.length > 3);
+
   if (!filtered.length) {
     g.innerHTML = `<div class="empty-state" style="grid-column:1/-1"><div class="icon">◈</div><h3>No ${currentFilter} projects found</h3><p>Try another filter or check the admin panel</p></div>`; return;
   }
@@ -294,6 +306,10 @@ function renderCerts() {
   const g = document.getElementById('certs-grid');
   if (!g) return;
   const emojis = ['🏆', '📜', '✅', '🎓', '⭐', '🔰'];
+
+  // Carousel logic: if more than 3, add class
+  g.classList.toggle('is-carousel', state.certs.length > 3);
+
   if (!state.certs.length) {
     g.innerHTML = `<div class="empty-state" style="grid-column:1/-1"><div class="icon">◇</div><h3>No certificates yet</h3><p>Add your first certificate from the admin panel</p></div>`; return;
   }
@@ -1272,17 +1288,25 @@ function renderGallery() {
     grid.innerHTML = '<div class="empty-state"><h3>No photos yet.</h3><p>Upload some photos from the Admin panel!</p></div>';
     return;
   }
-  grid.innerHTML = state.gallery.map(item => `
-    <div class="gallery-item" onclick="openGalleryModal(${item.id})">
-      <img src="${item.img}" alt="${item.title}" loading="lazy">
-      <div class="gallery-overlay">
-        <div class="gallery-info">
-          <h3>${item.title}</h3>
-          <div class="gallery-likes">❤️ ${item.likes || 0}</div>
+  grid.innerHTML = state.gallery.map((item, i) => {
+    let sizeClass = '';
+    const pos = i % 10;
+    if (pos === 0 || pos === 6) sizeClass = 'big';
+    else if (pos === 2 || pos === 7) sizeClass = 'wide';
+    else if (pos === 4 || pos === 9) sizeClass = 'tall';
+
+    return `
+      <div class="gallery-item ${sizeClass}" onclick="openGalleryModal(${item.id})">
+        <img src="${item.img}" alt="${item.title}" loading="lazy">
+        <div class="gallery-overlay">
+          <div class="gallery-info">
+            <h3>${item.title}</h3>
+            <div class="gallery-likes">❤️ ${item.likes || 0}</div>
+          </div>
         </div>
       </div>
-    </div>
-  `).join('');
+    `;
+  }).join('');
 }
 
 let currentGalleryId = null;
