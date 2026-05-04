@@ -1322,6 +1322,21 @@ function openGalleryModal(id) {
   if(desc) desc.textContent = item.desc;
   const likes = document.getElementById('gm-likes');
   if(likes) likes.textContent = `❤️ ${item.likes || 0} Likes`;
+  
+  const liked = JSON.parse(localStorage.getItem('osama_liked') || '[]');
+  const btn = document.getElementById('btn-like-main');
+  if (btn) {
+    if (liked.includes(id)) {
+      btn.textContent = 'Liked ❤️';
+      btn.disabled = true;
+      btn.style.opacity = '0.5';
+    } else {
+      btn.textContent = '❤️ Like';
+      btn.disabled = false;
+      btn.style.opacity = '1';
+    }
+  }
+
   const modal = document.getElementById('gallery-modal');
   if(modal) modal.style.display = 'flex';
 }
@@ -1342,11 +1357,18 @@ async function likeGalleryItem(id) {
   liked.push(id);
   localStorage.setItem('osama_liked', JSON.stringify(liked));
   
-  await setLocal('state', state);
+  await save();
   renderGallery();
   const likes = document.getElementById('gm-likes');
   if (currentGalleryId === id && likes) {
     likes.textContent = `❤️ ${item.likes} Likes`;
+  }
+
+  const btn = document.getElementById('btn-like-main');
+  if (btn) {
+    btn.textContent = 'Liked ❤️';
+    btn.disabled = true;
+    btn.style.opacity = '0.5';
   }
 }
 
