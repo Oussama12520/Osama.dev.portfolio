@@ -165,7 +165,13 @@
           <button class="filter-btn" onclick="setFilter('API')">APIs</button>
         </div>
 
-        <div class="projects-grid" id="projects-grid"></div>
+        <div class="grid-wrapper">
+          <div class="projects-grid" id="projects-grid"></div>
+          <div class="carousel-nav">
+            <button class="carousel-btn" onclick="scrollCarousel('projects-grid', -1)">←</button>
+            <button class="carousel-btn" onclick="scrollCarousel('projects-grid', 1)">→</button>
+          </div>
+        </div>
       </div>
     </section>
 
@@ -176,7 +182,13 @@
       <div class="section-inner">
         <div class="section-tag">// credentials</div>
         <h2 class="section-title">Certifications</h2>
-        <div class="certs-grid" id="certs-grid"></div>
+        <div class="grid-wrapper">
+          <div class="certs-grid" id="certs-grid"></div>
+          <div class="carousel-nav">
+            <button class="carousel-btn" onclick="scrollCarousel('certs-grid', -1)">←</button>
+            <button class="carousel-btn" onclick="scrollCarousel('certs-grid', 1)">→</button>
+          </div>
+        </div>
       </div>
     </section>
 
